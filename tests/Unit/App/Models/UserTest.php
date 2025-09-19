@@ -3,66 +3,43 @@
 namespace Tests\Unit\App\Models;
 
 use App\Models\User;
-use PHPUnit\Framework\TestCase;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
 
-class UserTest extends TestCase
+class UserTest extends ModelTestCase
 {
-    //Create the model to be tested for don't repeat code (new User) at each test
     protected function model(): Model
     {
         return new User();
     }
 
-    //Test of traits
-    public function test_traits(): void
+    protected function traits(): array
     {
-        $model = array_keys(class_uses($this->model()));
-
-        $expectedTraits = [
+        return [
             HasApiTokens::class,
             HasFactory::class,
             Notifiable::class,
         ];
-
-        $this->assertEquals(
-            $expectedTraits,
-            array_values($model)
-        );
     }
 
-    //Test of fillable
-    public function test_has_fillable(): void
+    protected function fillable(): array
     {
-        $this->assertEquals(
-            [
-                'name',
-                'email',
-                'password',
-            ],
-            $this->model()->getFillable()
-        );
+        return [
+            'name',
+            'email',
+            'password',
+        ];
     }
 
-    //Test of incrementing
-    public function test_incremementing_is_false()
+    protected function casts(): array
     {
-        $this->assertFalse($this->model()->incrementing);
+        return [
+            'id' => 'string',
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+        ];
     }
 
-    //Test of casts
-    public function test_has_casts(): void
-    {
-        $this->assertEquals(
-            [
-                'id' => 'string',
-                'email_verified_at' => 'datetime',
-                'password' => 'hashed',
-            ],
-            $this->model()->getCasts()
-        );
-    }
 }
