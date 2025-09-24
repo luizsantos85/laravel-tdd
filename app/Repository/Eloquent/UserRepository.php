@@ -3,9 +3,9 @@
 namespace App\Repository\Eloquent;
 
 use App\Models\User;
-// use App\Repository\UserRepositoryInterface;
+use App\Repository\Contracts\UserRepositoryInterface;
 
-class UserRepository
+class UserRepository implements UserRepositoryInterface
 {
     protected $model;
 
