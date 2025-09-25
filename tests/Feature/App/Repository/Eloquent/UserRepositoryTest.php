@@ -8,6 +8,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 use App\Models\User;
+use Illuminate\Database\QueryException;
 
 class UserRepositoryTest extends TestCase
 {
@@ -90,6 +91,35 @@ class UserRepositoryTest extends TestCase
         $this->assertIsObject($response);
         $this->assertDatabaseHas('users', [
             'email' => 'johndoe@example.com'
+        ]);
+    }
+
+    public function test_create_user_exception(): void
+    {
+        $data = [
+            'name' => 'John Doe',
+            // 'email' => 'johndoe@example.com',
+            'password' => bcrypt('password123'),
+        ];
+
+        $this->expectException(QueryException::class);
+        $response = $this->repository->create($data);
+    }
+
+    public function test_update_user(): void
+    {
+        $user = User::factory()->create();
+
+        $data = [
+            'name' => 'Jane Doe Updated',
+        ];
+
+        $response = $this->repository->update($user->email, $data);
+        $this->assertNotNull($response);
+        $this->assertIsObject($response);
+        $this->assertEquals('Jane Doe Updated', $response->name);
+        $this->assertDatabaseHas('users', [
+            'name' => 'Jane Doe Updated',
         ]);
     }
 }

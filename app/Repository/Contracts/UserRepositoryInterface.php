@@ -18,4 +18,12 @@ interface UserRepositoryInterface
      * @return object
      */
     public function create(array $data): object;
+
+    /**
+     * Atualiza o usuário com os dados fornecidos.
+     * @param string $email
+     * @param array $data
+     * @return object
+     */
+    public function update(string $email, array $data): object;
 }
