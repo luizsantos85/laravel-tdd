@@ -141,6 +141,7 @@ class UserRepositoryTest extends TestCase
         //$this->expectException(NotFoundException::class);
         // $this->repository->delete('fake_email');
 
+        // Usando try catch para validar a exception
         try {
             $this->repository->delete('fake_email');
             $this->assertTrue(false);
@@ -149,4 +150,24 @@ class UserRepositoryTest extends TestCase
         }
 
     }
+
+    public function test_find_user_by_email(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->repository->findByEmail($user->email);
+
+        $this->assertNotNull($response);
+        $this->assertIsObject($response);
+        $this->assertDatabaseHas('users', [
+            'email' => $response->email,
+        ]);
+    }
+
+    public function test_find_user_by_email_exception(): void
+    {
+        $this->expectException(NotFoundException::class);
+        $this->repository->findByEmail('fake_email');
+    }
+
 }

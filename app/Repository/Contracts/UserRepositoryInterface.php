@@ -33,4 +33,12 @@ interface UserRepositoryInterface
      * @return bool
      */
     public function delete(string $email): bool;
+
+    /**
+     * Get User by email
+     * @param string $email
+     * @return object
+     */
+    public function findByEmail(string $email): object;
+
 }
