@@ -8,6 +8,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 use App\Models\User;
+use App\Repository\Exception\NotFoundException;
 use Illuminate\Database\QueryException;
 
 class UserRepositoryTest extends TestCase
@@ -121,5 +122,31 @@ class UserRepositoryTest extends TestCase
         $this->assertDatabaseHas('users', [
             'name' => 'Jane Doe Updated',
         ]);
+    }
+
+    public function test_delete_user(): void
+    {
+        $user = User::factory()->create();
+
+        $this->repository->delete($user->email);
+
+        $this->assertTrue(true);
+        $this->assertDatabaseMissing('users', [
+            'email' => $user->email,
+        ]);
+    }
+
+    public function test_delete_user_exception(): void
+    {
+        //$this->expectException(NotFoundException::class);
+        // $this->repository->delete('fake_email');
+
+        try {
+            $this->repository->delete('fake_email');
+            $this->assertTrue(false);
+        } catch (\Throwable $th) {
+            $this->assertInstanceOf(NotFoundException::class, $th);
+        }
+
     }
 }

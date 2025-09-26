@@ -26,4 +26,11 @@ interface UserRepositoryInterface
      * @return object
      */
     public function update(string $email, array $data): object;
+
+    /**
+     * Deleta o usuário pelo email
+     * @param string $email
+     * @return bool
+     */
+    public function delete(string $email): bool;
 }
