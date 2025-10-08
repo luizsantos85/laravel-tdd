@@ -20,7 +20,17 @@ class UserController extends Controller
     {
         // $users = collect($this->repository->findAll());
         $response = $this->repository->paginate();
-        return UserResource::collection(collect($response->items()));
+        return UserResource::collection(collect($response->items()))
+        // Obs: Pode-se trabalhar com outro Presenter separado só para retorno do JSON
+            ->additional([
+                'meta' => [
+                    'total' => $response->total(),
+                    'current_page' => $response->currentPage(),
+                    'first_page' => $response->firstPage(),
+                    'last_page' => $response->lastPage(),
+                    'per_page' => $response->perPage(),
+                ]
+            ]);
     }
 
 }
