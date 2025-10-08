@@ -12,19 +12,43 @@ class UserApiTest extends TestCase
 {
     protected string $endPoint = '/api/users';
 
-    public function test_get_all_empty(): void
+    // public function test_get_all_empty(): void
+    // {
+    //     $response = $this->getJson($this->endPoint);
+    //     $response->assertStatus(Response::HTTP_OK);
+    // }
+
+    // public function test_get_all(): void
+    // {
+    //     User::factory()->count(20)->create();
+
+    //     $response = $this->getJson($this->endPoint);
+    //     $response->dump();
+    //     $response->assertStatus(Response::HTTP_OK);
+    //     $response->assertJsonCount(20, 'data');
+    // }
+
+    public function test_paginate_empty(): void
     {
         $response = $this->getJson($this->endPoint);
         $response->assertStatus(Response::HTTP_OK);
     }
 
-    public function test_get_all(): void
+    public function test_paginate(): void
+    {
+        User::factory()->count(40)->create();
+
+        $response = $this->getJson($this->endPoint);
+        $response->assertStatus(Response::HTTP_OK);
+        $response->assertJsonCount(15, 'data');
+    }
+
+    public function test_paginate_page_two(): void
     {
         User::factory()->count(20)->create();
 
-        $response = $this->getJson($this->endPoint);
-        $response->dump();
+        $response = $this->getJson("{$this->endPoint}?page=2");
         $response->assertStatus(Response::HTTP_OK);
-        $response->assertJsonCount(20, 'data');
+        $response->assertJsonCount(5, 'data');
     }
 }

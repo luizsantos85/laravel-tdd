@@ -41,4 +41,11 @@ interface UserRepositoryInterface
      */
     public function findByEmail(string $email): object;
 
+    /**
+     * Retorna todos os registros do repositório paginados como array.
+     *
+     * @param int $perPage
+     */
+    public function paginate(int $page = 1): PaginationInterface;
+
 }

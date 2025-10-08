@@ -3,8 +3,10 @@
 namespace App\Repository\Eloquent;
 
 use App\Models\User;
+use App\Repository\Contracts\PaginationInterface;
 use App\Repository\Contracts\UserRepositoryInterface;
 use App\Repository\Exception\NotFoundException;
+use App\Repository\Presenters\PaginationPresenter;
 
 class UserRepository implements UserRepositoryInterface
 {
@@ -18,6 +20,11 @@ class UserRepository implements UserRepositoryInterface
     public function findAll(): array
     {
         return $this->model->get()->toArray();
+    }
+
+    public function paginate(int $page = 1): PaginationInterface
+    {
+        return new PaginationPresenter($this->model->paginate());
     }
 
     public function create(array $data): object
