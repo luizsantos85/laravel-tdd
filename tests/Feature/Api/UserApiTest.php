@@ -5,6 +5,7 @@ namespace Tests\Feature\Api;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Illuminate\Http\Response;
 use Tests\TestCase;
 
@@ -28,11 +29,36 @@ class UserApiTest extends TestCase
     //     $response->assertJsonCount(20, 'data');
     // }
 
-    public function test_paginate_empty(): void
+    // public function test_paginate_empty(): void
+    // {
+    //     $response = $this->getJson($this->endPoint);
+    //     $response->assertStatus(Response::HTTP_OK);
+    //     $response->assertJsonCount(0, 'data');
+    //     $response->assertJsonStructure([
+    //         'meta' => [
+    //             'total',
+    //             'current_page',
+    //             'first_page',
+    //             'last_page',
+    //             'per_page',
+    //         ],
+    //         'data'
+    //     ]);
+    //     // $response->assertJsonPath('meta.total', 0);
+    //     $response->assertJsonFragment([
+    //         'total' => 0,
+    //     ]);
+    // }
+
+    #[DataProvider('dataProviderPagination')] // DataProvider do PHPUnit 9.3+
+    public function test_paginate(int $total, int $page = 1, int $totalItemsPage = 15): void
     {
-        $response = $this->getJson($this->endPoint);
-        $response->assertStatus(Response::HTTP_OK);
-        $response->assertJsonCount(0, 'data');
+        User::factory()->count($total)->create();
+
+        $response = $this->getJson("{$this->endPoint}?page={$page}");
+        // $response->assertStatus(Response::HTTP_OK);
+        $response->assertOk();
+        $response->assertJsonCount($totalItemsPage, 'data');
         $response->assertJsonStructure([
             'meta' => [
                 'total',
@@ -40,29 +66,21 @@ class UserApiTest extends TestCase
                 'first_page',
                 'last_page',
                 'per_page',
+            ],
+            'data' => [
+                '*' => [
+                    'id',
+                    'name',
+                    'email',
+                ]
             ]
         ]);
-        $response->assertJsonPath('meta.total', 0);
-    }
-
-    public function test_paginate(): void
-    {
-        User::factory()->count(40)->create();
-
-        $response = $this->getJson($this->endPoint);
-        $response->assertStatus(Response::HTTP_OK);
-        $response->assertJsonCount(15, 'data');
-        $response->assertJsonStructure([
-            'meta' => [
-                'total',
-                'current_page',
-                'first_page',
-                'last_page',
-                'per_page',
-            ]
+        // $response->assertJsonPath('meta.total', 40);
+        // $response->assertJsonPath('meta.current_page', 1);
+        $response->assertJsonFragment([
+            'total' => $total,
+            'current_page' => $page,
         ]);
-        $response->assertJsonPath('meta.total', 40);
-        $response->assertJsonPath('meta.current_page', 1);
     }
 
     public function test_paginate_page_two(): void
@@ -72,7 +90,22 @@ class UserApiTest extends TestCase
         $response = $this->getJson("{$this->endPoint}?page=2");
         $response->assertStatus(Response::HTTP_OK);
         $response->assertJsonCount(5, 'data');
-        $response->assertJsonPath('meta.total', 20);
-        $response->assertJsonPath('meta.current_page', 2);
+        // $response->assertJsonPath('meta.total', 20);
+        // $response->assertJsonPath('meta.current_page', 2);
+        $response->assertJsonFragment([
+            'total' => 20,
+            'current_page' => 2,
+        ]);
+    }
+
+    public static function dataProviderPagination(): array
+    {
+        return [
+            'test paginate empty' => ['total' => 0, 'page' => 1,'totalItemsPage' => 0],
+            'test total 40 users page one' => ['total' => 40, 'page' => 1,'totalItemsPage' => 15],
+            'test total 20 users page two' => ['total' => 20, 'page' => 2,'totalItemsPage' => 5],
+            'test total 10 users page two' => ['total' => 10, 'page' => 2,'totalItemsPage' => 0]
+
+        ];
     }
 }
