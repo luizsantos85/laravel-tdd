@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\User\createUserFormRequest;
 use App\Http\Resources\UserResource;
 use App\Repository\Contracts\UserRepositoryInterface;
 use Illuminate\Http\Request;
@@ -33,14 +34,9 @@ class UserController extends Controller
             ]);
     }
 
-    public function store(Request $request)
+    public function store(createUserFormRequest $request)
     {
-        // $data = $request->validate([
-        //     'name' => 'required|string|max:255',
-        //     'email' => 'required|string|email|max:255|unique:users',
-        //     'password' => 'required|string|min:8',
-        // ]);
-        $data = $request->all();
+        $data = $request->validated();
 
         $user = $this->repository->create($data);
 

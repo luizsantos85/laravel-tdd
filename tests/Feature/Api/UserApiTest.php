@@ -101,30 +101,51 @@ class UserApiTest extends TestCase
     public static function dataProviderPagination(): array
     {
         return [
-            'test paginate empty' => ['total' => 0, 'page' => 1,'totalItemsPage' => 0],
-            'test total 40 users page one' => ['total' => 40, 'page' => 1,'totalItemsPage' => 15],
-            'test total 20 users page two' => ['total' => 20, 'page' => 2,'totalItemsPage' => 5],
-            'test total 10 users page two' => ['total' => 10, 'page' => 2,'totalItemsPage' => 0]
-
+            'test paginate empty' => ['total' => 0, 'page' => 1, 'totalItemsPage' => 0],
+            'test total 40 users page one' => ['total' => 40, 'page' => 1, 'totalItemsPage' => 15],
+            'test total 20 users page two' => ['total' => 20, 'page' => 2, 'totalItemsPage' => 5],
+            'test total 10 users page two' => ['total' => 10, 'page' => 2, 'totalItemsPage' => 0]
         ];
     }
 
-    public function test_create()
+    #[DataProvider('dataProviderUser')]
+    public function test_create(array $data, int $statusCode, array $structureResponse)
     {
-        $data = [
-            'name' => 'Luiz',
-            'email' => 'luiz.santos85@gmail.com',
-            'password' => '12345678'
-        ];
-
         $response = $this->postJson($this->endPoint, $data);
-        $response->assertStatus(Response::HTTP_CREATED);
-        $response->assertJsonStructure([
-           'data' =>[
-                'id',
-                'name',
-                'email',
-            ]
-        ]);
+        $response->assertStatus($statusCode);
+        $response->assertJsonStructure($structureResponse);
+    }
+
+    public static function dataProviderUser(): array
+    {
+        return [
+            'test create user' => [
+                'data' =>
+                [
+                    'name' => 'Luiz',
+                    'email' => 'luiz.santos85@gmail.com',
+                    'password' => '12345678'
+                ],
+                'statusCode' => Response::HTTP_CREATED,
+                'structureResponse' =>
+                [
+                    'data' =>
+                    [
+                        'id',
+                        'name',
+                        'email',
+                    ]
+                ]
+            ],
+            'test validations' => [
+                'data' => [],
+                'statusCode' => Response::HTTP_UNPROCESSABLE_ENTITY,
+                'structureResponse' => [
+                    'errors' => ['name']
+                ]
+            ],
+
+
+        ];
     }
 }
