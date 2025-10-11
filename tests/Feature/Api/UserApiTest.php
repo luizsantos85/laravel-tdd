@@ -108,4 +108,23 @@ class UserApiTest extends TestCase
 
         ];
     }
+
+    public function test_create()
+    {
+        $data = [
+            'name' => 'Luiz',
+            'email' => 'luiz.santos85@gmail.com',
+            'password' => '12345678'
+        ];
+
+        $response = $this->postJson($this->endPoint, $data);
+        $response->assertStatus(Response::HTTP_CREATED);
+        $response->assertJsonStructure([
+           'data' =>[
+                'id',
+                'name',
+                'email',
+            ]
+        ]);
+    }
 }
