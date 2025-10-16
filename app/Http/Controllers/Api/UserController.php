@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\User\createUserFormRequest;
 use App\Http\Resources\UserResource;
 use App\Repository\Contracts\UserRepositoryInterface;
-use Illuminate\Http\Request;
+use App\Repository\Exception\NotFoundException;
 
 class UserController extends Controller
 {
@@ -42,5 +42,43 @@ class UserController extends Controller
 
         return new UserResource($user);
     }
+
+    public function show(string $email)
+    {
+        try {
+            $user = $this->repository->findByEmail($email);
+            return new UserResource($user);
+        } catch (NotFoundException $e) {
+            return response()->json(['message' => $e->getMessage()], 404);
+        }
+    }
+
+    // public function update(createUserFormRequest $request, $email)
+    // {
+    //     $data = $request->validated();
+
+    //     $user = $this->repository->findByEmail($email);
+
+    //     if (!$user) {
+    //         return response()->json(['message' => 'User not found'], 404);
+    //     }
+
+    //     $this->repository->update($email, $data);
+
+    //     return new UserResource($this->repository->findByEmail($email));
+    // }
+
+    // public function destroy(string $email)
+    // {
+    //     $user = $this->repository->findByEmail($email);
+
+    //     if (!$user) {
+    //         return response()->json(['message' => 'User not found'], 404);
+    //     }
+
+    //     $this->repository->delete($email);
+
+    //     return response()->json([], 204);
+    // }
 
 }

@@ -144,8 +144,28 @@ class UserApiTest extends TestCase
                     'errors' => ['name']
                 ]
             ],
-
-
         ];
+    }
+
+    public function test_show_user()
+    {
+        $user = User::factory()->create();
+
+        $response = $this->getJson("{$this->endPoint}/{$user->email}");
+        $response->assertStatus(Response::HTTP_OK);
+        $response->assertJsonStructure([
+            'data' =>
+            [
+                'id',
+                'name',
+                'email',
+            ]
+        ]);
+    }
+
+    public function test_show_user_not_found()
+    {
+        $response = $this->getJson("{$this->endPoint}/fake_value");
+        $response->assertStatus(Response::HTTP_NOT_FOUND);
     }
 }
