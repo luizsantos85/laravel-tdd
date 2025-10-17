@@ -168,4 +168,65 @@ class UserApiTest extends TestCase
         $response = $this->getJson("{$this->endPoint}/fake_value");
         $response->assertStatus(Response::HTTP_NOT_FOUND);
     }
+
+    #[DataProvider('dataProviderUpdateUser')]
+    public function test_update_user(array $data, int $statusCode)
+    {
+        $user = User::factory()->create();
+        $response = $this->putJson("{$this->endPoint}/{$user->email}", $data);
+
+        $response->assertStatus($statusCode);
+    }
+
+    // public function test_update_user_validatons()
+    // {
+    //     $user = User::factory()->create();
+    //     $response = $this->putJson("{$this->endPoint}/{$user->email}", [
+    //         'name' => '',
+    //         'password' => '123'
+    //     ]);
+
+    //     $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+    //     $response->assertJsonStructure([
+    //         'errors' => ['name', 'password']
+    //     ]);
+    // }
+
+    public static function dataProviderUpdateUser(): array
+    {
+        return [
+            'test update user' => [
+                'data' => [
+                    'name' => 'Luiz Santos',
+                    'password' => 'new_password'
+                ],
+                'statusCode' => Response::HTTP_OK,
+            ],
+            'test validations - empty name' => [
+                'data' => [
+                    'name' => '',
+                    'password' => 'new_password'
+                ],
+                'statusCode' => Response::HTTP_UNPROCESSABLE_ENTITY,
+            ],
+            'test validations - short password' => [
+                'data' => [
+                    'name' => 'Nome Valido',
+                    'password' => '123'
+                ],
+                'statusCode' => Response::HTTP_UNPROCESSABLE_ENTITY,
+            ],
+            'test validations - name too long' => [
+                'data' => [
+                    'name' => str_repeat('a', 256),
+                    'password' => 'new_password'
+                ],
+                'statusCode' => Response::HTTP_UNPROCESSABLE_ENTITY,
+            ],
+            'test validations - missing fields' => [
+                'data' => [],
+                'statusCode' => Response::HTTP_UNPROCESSABLE_ENTITY,
+            ],
+        ];
+    }
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\updateUserFormRequest;
 use App\Http\Requests\User\createUserFormRequest;
 use App\Http\Resources\UserResource;
 use App\Repository\Contracts\UserRepositoryInterface;
@@ -53,20 +54,20 @@ class UserController extends Controller
         }
     }
 
-    // public function update(createUserFormRequest $request, $email)
-    // {
-    //     $data = $request->validated();
+    public function update(updateUserFormRequest $request, $email)
+    {
+        $data = $request->validated();
 
-    //     $user = $this->repository->findByEmail($email);
+        $user = $this->repository->findByEmail($email);
 
-    //     if (!$user) {
-    //         return response()->json(['message' => 'User not found'], 404);
-    //     }
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
 
-    //     $this->repository->update($email, $data);
+        $this->repository->update($email, $data);
 
-    //     return new UserResource($this->repository->findByEmail($email));
-    // }
+        return new UserResource($this->repository->findByEmail($email));
+    }
 
     // public function destroy(string $email)
     // {
