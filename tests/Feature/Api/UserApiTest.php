@@ -229,4 +229,27 @@ class UserApiTest extends TestCase
             ],
         ];
     }
+
+    public function test_update_not_found()
+    {
+        $response = $this->putJson("{$this->endPoint}/fake_value", [
+            'name' => 'Nome',
+            'password' => 'new_password'
+        ]);
+        $response->assertStatus(Response::HTTP_NOT_FOUND);
+    }
+
+    public function test_delete_not_found()
+    {
+        $response = $this->deleteJson("{$this->endPoint}/fake_value");
+        $response->assertStatus(Response::HTTP_NOT_FOUND);
+    }
+
+    public function test_delete_user()
+    {
+        $user = User::factory()->create();
+
+        $response = $this->deleteJson("{$this->endPoint}/{$user->email}");
+        $response->assertStatus(Response::HTTP_NO_CONTENT);
+    }
 }

@@ -58,28 +58,26 @@ class UserController extends Controller
     {
         $data = $request->validated();
 
-        $user = $this->repository->findByEmail($email);
-
-        if (!$user) {
-            return response()->json(['message' => 'User not found'], 404);
+        try {
+            $this->repository->findByEmail($email);
+        } catch (NotFoundException $e) {
+            return response()->json(['message' => $e->getMessage()], 404);
         }
 
-        $this->repository->update($email, $data);
+        $user = $this->repository->update($email, $data);
 
-        return new UserResource($this->repository->findByEmail($email));
+        return new UserResource($user);
     }
 
-    // public function destroy(string $email)
-    // {
-    //     $user = $this->repository->findByEmail($email);
+    public function destroy(string $email)
+    {
+        try {
+            $this->repository->delete($email);
+        } catch (NotFoundException $e) {
+            return response()->json(['message' => $e->getMessage()], 404);
+        }
 
-    //     if (!$user) {
-    //         return response()->json(['message' => 'User not found'], 404);
-    //     }
-
-    //     $this->repository->delete($email);
-
-    //     return response()->json([], 204);
-    // }
+        return response()->noContent();
+    }
 
 }
